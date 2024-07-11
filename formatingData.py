@@ -3,7 +3,6 @@ import jsonlines
 import pandas as pd
 from pprint import pprint
 
-
 filename = "lamini_docs.jsonl"
 instruction_dataset_df = pd.read_json(filename, lines=True)
 examples = instruction_dataset_df.to_dict()

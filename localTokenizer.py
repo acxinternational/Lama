@@ -9,7 +9,6 @@ def tokenize_function(examples):
     else:
         text = examples["text"][0]
 
-    tokenizer.pad_token = tokenizer.eos_token
     tokenized_inputs = tokenizer(
         text,
         return_tensors="np",

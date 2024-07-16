@@ -1,28 +1,12 @@
-import os
+import logging
 
-from sympy import pprint
+import torch
+from transformers import AutoModelForCausalLM
+from transformers import AutoTokenizer, Trainer
+from transformers import TrainingArguments
+from transformers.data import data_collator
 
 from common import *
-
-import datasets
-import tempfile
-import logging
-import random
-import config
-import os
-import yaml
-import time
-import torch
-import transformers
-import pandas as pd
-import jsonlines
-
-from transformers import AutoTokenizer, Trainer
-from transformers import AutoModelForCausalLM
-from transformers import TrainingArguments
-from transformers import AutoModelForCausalLM
-from llama import BasicModelRunner
-
 from dataPreperation import tokenize_and_split_data
 
 logger = logging.getLogger(__name__)
@@ -40,18 +24,15 @@ training_config = {
     "verbose": True
 }
 
-tokenizer = AutoTokenizer.from_pretrained(model_pythia_70m_name)
-tokenizer.pad_token = tokenizer.eos_token
 train_dataset, test_dataset = tokenize_and_split_data()
-
 base_model = AutoModelForCausalLM.from_pretrained(model_pythia_70m_name)
 
 device_count = torch.cuda.device_count()
 if device_count > 0:
-    logger.debug("Select GPU device")
+    print("Selected GPU device")
     device = torch.device("cuda")
 else:
-    logger.debug("Select CPU device")
+    print("Selected CPU device")
     device = torch.device("cpu")
 
 base_model.to(device)
@@ -59,14 +40,14 @@ base_model.to(device)
 dataset_Inx = 33
 test_text = test_dataset[dataset_Inx]['question']
 
-max_steps = 100
+max_steps = 3
 trained_model_name = f"lamini_docs_{max_steps}_steps"
 output_dir = trained_model_name
 
 training_args = TrainingArguments(
 
     # Learning rate
-    learning_rate=1.0e-5,
+    learning_rate=1.0e-4,
 
     # Number of training epochs
     num_train_epochs=1,
@@ -84,11 +65,11 @@ training_args = TrainingArguments(
     # Other arguments
     overwrite_output_dir=False, # Overwrite the content of the output directory
     disable_tqdm=False, # Disable progress bars
-    eval_steps=240, # Number of update steps between two evaluations
-    save_steps=240, # After # steps model is saved
-    warmup_steps=3, # Number of warmup steps for learning rate scheduler
+    eval_steps=120, # Number of update steps between two evaluations
+    save_steps=120, # After # steps model is saved
+    warmup_steps=0, # Number of warmup steps for learning rate scheduler
     per_device_eval_batch_size=1, # Batch size for evaluation
-    evaluation_strategy="steps",
+    eval_strategy="steps",
     logging_strategy="steps",
     logging_steps=1,
     optim="adafactor",
@@ -118,6 +99,7 @@ trainer = Trainer(
     args=training_args,
     train_dataset=train_dataset,
     eval_dataset=test_dataset,
+    # data_collator=data_collator   # Ensure this collator returns attention_mask
 )
 
 training_output = trainer.train()

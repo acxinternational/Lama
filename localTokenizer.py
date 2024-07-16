@@ -1,4 +1,4 @@
-from tokenizer import tokenizer
+from common import tokenizer
 
 
 def tokenize_function(examples):
@@ -19,7 +19,12 @@ def tokenize_function(examples):
         tokenized_inputs["input_ids"].shape[1],
         2048
     )
+
+    if tokenized_inputs["input_ids"].shape[1] > max_length:
+        print(f"Truncating input from {tokenized_inputs['input_ids'].shape[1]} to {max_length}")
+
     tokenizer.truncation_side = "left"
+
     tokenized_inputs = tokenizer(
         text,
         return_tensors="np",

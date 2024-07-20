@@ -27,7 +27,6 @@ def inference(text, model, max_input_tokens=100, max_output_tokens=100):
     device = model.device
     generated_tokens_with_prompt = model.generate(
         input_ids=input_ids.to(device),
-        attention_mask=attention_mask.to(device),
         max_length=max_output_tokens,
         pad_token_id=tokenizer.eos_token_id
     )

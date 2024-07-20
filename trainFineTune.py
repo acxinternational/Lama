@@ -2,9 +2,8 @@ import logging
 
 import torch
 from transformers import AutoModelForCausalLM
-from transformers import AutoTokenizer, Trainer
+from transformers import Trainer
 from transformers import TrainingArguments
-from transformers.data import data_collator
 
 from common import *
 from dataPreperation import tokenize_and_split_data

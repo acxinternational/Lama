@@ -1,16 +1,15 @@
+from datasets import load_from_disk
+from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer, DataCollatorForLanguageModeling
 import evaluate
 import numpy as np
 import torch
-from datasets import load_from_disk
-from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer, \
-    DataCollatorForLanguageModeling
 
 # Load the dataset
 outputDir = "./Nietzsche_Model"
 dataset = load_from_disk('../LocalDatasets/beyond_good_and_evil')
-'''
+
 # Initialize the tokenizer
-checkpoint = "gpt2"
+checkpoint = "gpt2-medium"  # Use a larger model if possible
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 tokenizer.pad_token = tokenizer.eos_token
 
@@ -32,7 +31,7 @@ def preprocess_function(examples):
     return f_inputs
 
 
-tokenized_datasets = tokenized_datasets.map(preprocess_function, batched=False, remove_columns=['prompt', 'completion'])
+tokenized_datasets = tokenized_datasets.map(preprocess_function, batched=True, remove_columns=['prompt', 'completion'])
 
 # Initialize the data collator
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
@@ -48,11 +47,10 @@ model = AutoModelForCausalLM.from_pretrained(checkpoint)
 training_args = TrainingArguments(
     output_dir=outputDir,
     evaluation_strategy='steps',
-    learning_rate=3e-6,
-    per_device_train_batch_size=1,  # Set batch size to 1
-    per_device_eval_batch_size=1,   # Set batch size to 1
-    # num_train_epochs=1,
-    max_steps=90,
+    learning_rate=1e-5,  # Adjust learning rate
+    per_device_train_batch_size=4,  # Increase batch size
+    per_device_eval_batch_size=4,   # Increase batch size
+    max_steps=200,  # Increase training steps
     weight_decay=0.01,
     save_total_limit=3,
 )
@@ -88,6 +86,7 @@ trainer = Trainer(
     compute_metrics=compute_metrics,
 )
 
+
 # Train the model
 trainer.train()
 
@@ -95,19 +94,17 @@ trainer.train()
 outputModelDir = outputDir + '/final'
 model.save_pretrained(outputModelDir)
 tokenizer.save_pretrained(outputModelDir)
-'''
-outputModelDir = outputDir + '/final'
 
 # Load the model and tokenizer for inference
 model = AutoModelForCausalLM.from_pretrained(outputModelDir)
 tokenizer = AutoTokenizer.from_pretrained(outputModelDir)
 
 # Example inference
-example_prompt = 'What does Nietzsche mean by the word "human"?'
+example_prompt = "What is the main idea of Nietzsche's philosophy?"
 
 inputs = tokenizer(example_prompt, return_tensors='pt', truncation=True, padding=True, max_length=512)
 with torch.no_grad():
-    outputs = model.generate(**inputs, max_length=256, num_beams=2, no_repeat_ngram_size=1, early_stopping=True)
+    outputs = model.generate(**inputs, max_length=256, num_beams=10, no_repeat_ngram_size=2, early_stopping=True)
     completion = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 print(f"Generated completion: {completion}")

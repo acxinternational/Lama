@@ -5,8 +5,8 @@ from transformers import AutoModelForCausalLM
 from transformers import Trainer
 from transformers import TrainingArguments
 
-from common import *
-from dataPreperation import tokenize_and_split_data
+from DeepAI.common import *
+from DeepAI.dataPreperation import tokenize_and_split_data
 
 logger = logging.getLogger(__name__)
 global_config = None

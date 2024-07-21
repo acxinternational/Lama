@@ -1,4 +1,4 @@
-from common import local_tokenizer
+from DeepAI.common import local_tokenizer
 
 
 def tokenize_function(examples):

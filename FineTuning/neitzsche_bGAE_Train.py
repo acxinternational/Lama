@@ -1,9 +1,6 @@
-import evaluate
-import numpy as np
 import torch
 from datasets import load_from_disk
-from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer, \
-    DataCollatorForLanguageModeling
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # Load the dataset
 outputDir = "./Nietzsche_Model"

@@ -1,5 +1,4 @@
 import lamini
-from llama import BasicModelRunner
 from transformers import AutoTokenizer
 
 lamini.api_key = "ceefc6b819fc7fb17e02ea7332283f301e5d6b02a38bd67e1ac360cbf8615dc1"
@@ -10,13 +9,12 @@ bts_dataset = "lamini/bts"
 open_llms = "lamini/open_llms"
 model_pythia_70m_name = "EleutherAI/pythia-70m"
 
-tokenizer = AutoTokenizer.from_pretrained(model_pythia_70m_name)
-tokenizer.pad_token = tokenizer.eos_token
-
+local_tokenizer = AutoTokenizer.from_pretrained(model_pythia_70m_name)
+local_tokenizer.pad_token = local_tokenizer.eos_token
 
 def inference(text, model, max_input_tokens=100, max_output_tokens=100):
     # Tokenize
-    input_ids = tokenizer.encode(
+    input_ids = local_tokenizer.encode(
         text,
         return_tensors="pt",
         truncation=True,
@@ -28,11 +26,11 @@ def inference(text, model, max_input_tokens=100, max_output_tokens=100):
     generated_tokens_with_prompt = model.generate(
         input_ids=input_ids.to(device),
         max_length=max_output_tokens,
-        pad_token_id=tokenizer.eos_token_id
+        pad_token_id=local_tokenizer.eos_token_id
     )
 
     # Decode
-    generated_text_with_prompt = tokenizer.batch_decode(generated_tokens_with_prompt, skip_special_tokens=True)
+    generated_text_with_prompt = local_tokenizer.batch_decode(generated_tokens_with_prompt, skip_special_tokens=True)
 
     # Strip the prompt
     generated_text_answer = generated_text_with_prompt[0][len(text):]

@@ -10,7 +10,6 @@ import yaml
 import torch
 
 from transformers import Trainer, AutoModelForCausalLM, AutoTokenizer
-from trainFineTune import training_config
 
 logger = logging.getLogger(__name__)
 global_config = None
@@ -120,19 +119,19 @@ def tokenize_and_split_data(training_config, tokenizer):
     if use_hf:
         dataset = datasets.load_dataset(dataset_path)
     else:
-        dataset = load_dataset(dataset_path, tokenizer)
+        dataset = load_dataset(dataset_path, tokenizer, training_config)
     train_dataset = dataset["train"]
     test_dataset = dataset["test"]
     return train_dataset, test_dataset
 
 
 # Tokenize and split data
-def load_dataset(dataset_path, tokenizer):
+def load_dataset(dataset_path, tokenizer, training_config):
     random.seed(42)
-    finetuning_dataset_loaded = datasets.load_dataset("json", data_files=dataset_path, split="train")
+    fine_tuning_dataset_loaded = datasets.load_dataset("json", data_files=dataset_path, split="train")
     tokenizer.pad_token = tokenizer.eos_token
     max_length = training_config["model"]["max_length"]
-    tokenized_dataset = finetuning_dataset_loaded.map(
+    tokenized_dataset = fine_tuning_dataset_loaded.map(
         get_tokenize_function(tokenizer, max_length),  # returns tokenize_function
         batched=True,
         batch_size=1,
@@ -158,7 +157,7 @@ def get_tokenize_function(tokenizer, _max_length):
         else:
             text = examples["text"][0]
 
-        # Run tokenizer on all the text (the input and the output)
+        # Run loacl_tokenizer on all the text (the input and the output)
         tokenized_inputs = tokenizer(
             text,
 
@@ -200,7 +199,7 @@ def get_tokenize_function(tokenizer, _max_length):
 # ######### MODEL ##########
 # ##########################
 
-# Load model onto the right device (GPU if available), and load tokenizer
+# Load model onto the right device (GPU if available), and load loacl_tokenizer
 def load_model(target_training_config, load_base_model=False):
     model_load_path = ""
     model_load_path = target_training_config["model"]["pretrained_name"]

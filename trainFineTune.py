@@ -39,7 +39,7 @@ base_model.to(device)
 dataset_Inx = 33
 test_text = test_dataset[dataset_Inx]['question']
 
-max_steps = 3
+max_steps = 10
 trained_model_name = f"lamini_docs_{max_steps}_steps"
 output_dir = trained_model_name
 
@@ -106,6 +106,8 @@ training_output = trainer.train()
 save_dir = f'{output_dir}/final'
 
 trainer.save_model(save_dir)
+local_tokenizer.save_pretrained(save_dir)
+local_tokenizer.save_vocabulary(save_dir)
 
 fine_tuned_slightly_model = AutoModelForCausalLM.from_pretrained(save_dir, local_files_only=True)
 fine_tuned_slightly_model.to(device)

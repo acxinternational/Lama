@@ -1,0 +1,52 @@
+{
+  "builder_name": "csv",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "neitzsche_beyond_good_and_evil_convo",
+  "dataset_size": 411026,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/Augustya07/neitzsche_beyond_good_and_evil_convo@f76c977dfb7903f1dccaef6d592fb877538c357d/train.csv": {
+      "num_bytes": 377855,
+      "checksum": null
+    },
+    "hf://datasets/Augustya07/neitzsche_beyond_good_and_evil_convo@f76c977dfb7903f1dccaef6d592fb877538c357d/test.csv": {
+      "num_bytes": 32660,
+      "checksum": null
+    }
+  },
+  "download_size": 410515,
+  "features": {
+    "prompt": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "completion": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 821541,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 378283,
+      "num_examples": 458,
+      "dataset_name": "neitzsche_beyond_good_and_evil_convo"
+    },
+    "test": {
+      "name": "test",
+      "num_bytes": 32743,
+      "num_examples": 56,
+      "dataset_name": "neitzsche_beyond_good_and_evil_convo"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}
